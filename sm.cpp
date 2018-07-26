@@ -31,6 +31,6 @@ void show_board(vector<vector<STONE> > &board){
 int main(){
 	vector<vector<STONE> > board(line, vector<STONE>(line,NONE));
 	show_board(board);
-
+	cout<<"안녕\n";
 	return 0;
 }
