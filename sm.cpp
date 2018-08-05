@@ -1,36 +1,74 @@
-#include <iostream>
-#include <vector>
-using namespace std;
 
-#define line 19
+#include <stdio.h>
+#include <Windows.h>
+#include <time.h>
+#include "Connect6Algo.h"
+#define BOARD_SIZE 20
+#define intmax 1000000000
+#define intmin -1000000000
 
+char info[] = { "TeamName:·êº£ÀÌ½º>µö·¯´×,Department:°í·Á´ëÇÐ±³" };
+int board[BOARD_SIZE][BOARD_SIZE];
 
-/*
-six mok rule
-put the stone 2 times at once;
-But first turn only put 1 stone.
-there can be obstacles.
-obstacles are treated as the ally stone
-*/
-enum STONE{
-	NONE,
-	BLACK,
-	WHITE
-};
-
-
-void show_board(vector<vector<STONE> > &board){
-	for(int i=0; i<line; i++){
-		for(int j=0; j<line; j++){
-			cout<<board[i][j]<<" ";
+int board_init(){
+	for(int i=0; i<BOARD_SIZE; i++){
+		for(int j=0; j<BOARD_SIZE; j++){
+			board[i][j] = showBoard(i,j);
 		}
-		cout<<"\n";
 	}
 }
 
-int main(){
-	vector<vector<STONE> > board(line, vector<STONE>(line,NONE));
-	show_board(board);
-	cout<<"ì•ˆë…•\n";
+struct putstone{
+	int x[2];
+	int y[2];
+	int score;
+};
+
+putstone alpha_beta_search(){
+	return max_value();
+}
+
+putstone max_value(){
+	if(terminal_test()){
+		return putstone{{-1,-1},{-1,-1}, utility()};
+	}
+}
+
+putstone min_value(){
+	if(terminal_test()){
+		return putstone{{-1,-1}, {-1,-1}, utility()};
+	}
+}
+
+bool terminal_test(){
+	return false;
+}
+
+int utility(){
 	return 0;
+}
+
+void myturn(int cnt) {
+	
+	int x[2], y[2];
+
+	// ÀÌ ºÎºÐ¿¡¼­ ¾Ë°í¸®Áò ÇÁ·Î±×·¥(AI)À» ÀÛ¼ºÇÏ½Ê½Ã¿À. ±âº» Á¦°øµÈ ÄÚµå¸¦ ¼öÁ¤ ¶Ç´Â »èÁ¦ÇÏ°í º»ÀÎÀÌ ÄÚµå¸¦ »ç¿ëÇÏ½Ã¸é µË´Ï´Ù.
+	// ÇöÀç Sample codeÀÇ AI´Â RandomÀ¸·Î µ¹À» ³õ´Â AlgorithmÀÌ ÀÛ¼ºµÇ¾î ÀÖ½À´Ï´Ù.
+
+	srand((unsigned)time(NULL));
+
+	for (int i = 0; i < cnt; i++) {
+		do {
+			x[i] = rand() % width;
+			y[i] = rand() % height;
+			if (terminateAI) return;
+		} while (!isFree(x[i], y[i]));
+
+		if (x[1] == x[0] && y[1] == y[0]) i--;
+	}
+
+	// ÀÌ ºÎºÐ¿¡¼­ ÀÚ½ÅÀÌ ³õÀ» µ¹À» Ãâ·ÂÇÏ½Ê½Ã¿À.
+	// ÇÊ¼ö ÇÔ¼ö : domymove(x¹è¿­,y¹è¿­,¹è¿­Å©±â)
+	// ¿©±â¼­ ¹è¿­Å©±â(cnt)´Â myturn()ÀÇ ÆÄ¶ó¹ÌÅÍ cnt¸¦ ±×´ë·Î ³Ö¾î¾ßÇÕ´Ï´Ù.
+	domymove(x, y, cnt);
 }
