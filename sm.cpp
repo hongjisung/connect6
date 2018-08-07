@@ -258,7 +258,7 @@ void count_state(){
 						danger_state[encons-2]++;
 					}
 					if(encons==6){
-						end_state[0]++;
+						end_state[1]++;
 						return;
 					}
 				}
@@ -272,7 +272,7 @@ void count_state(){
 					danger_state[encons-2]++;
 				}
 				if(encons==6){
-					end_state[0]++;
+					end_state[1]++;
 					return;
 				}
 				encons = 0;
@@ -287,7 +287,7 @@ void count_state(){
 				danger_state[encons-2]++;
 			}
 			if(encons==6){
-				end_state[0]++;
+				end_state[1]++;
 				return;
 			}
 		}
@@ -370,7 +370,7 @@ void count_state(){
 						danger_state[encons-2]++;
 					}
 					if(encons==6){
-						end_state[0]++;
+						end_state[1]++;
 						return;
 					}
 				}
@@ -384,7 +384,7 @@ void count_state(){
 					danger_state[encons-2]++;
 				}
 				if(encons==6){
-					end_state[0]++;
+					end_state[1]++;
 					return;
 				}
 				encons = 0;
@@ -399,7 +399,7 @@ void count_state(){
 				danger_state[encons-2]++;
 			}
 			if(encons==6){
-				end_state[0]++;
+				end_state[1]++;
 				return;
 			}
 		}
@@ -488,7 +488,7 @@ void count_state(){
 						danger_state[encons-2]++;
 					}
 					if(encons==6){
-						end_state[0]++;
+						end_state[1]++;
 						return;
 					}
 				}
@@ -502,7 +502,7 @@ void count_state(){
 					danger_state[encons-2]++;
 				}
 				if(encons==6){
-					end_state[0]++;
+					end_state[1]++;
 					return;
 				}
 				encons = 0;
@@ -517,7 +517,7 @@ void count_state(){
 				danger_state[encons-2]++;
 			}
 			if(encons==6){
-				end_state[0]++;
+				end_state[1]++;
 				return;
 			}
 		}
@@ -608,7 +608,7 @@ void count_state(){
 						danger_state[encons-2]++;
 					}
 					if(encons==6){
-						end_state[0]++;
+						end_state[1]++;
 						return;
 					}
 				}
@@ -622,7 +622,7 @@ void count_state(){
 					danger_state[encons-2]++;
 				}
 				if(encons==6){
-					end_state[0]++;
+					end_state[1]++;
 					return;
 				}
 				encons = 0;
@@ -637,7 +637,7 @@ void count_state(){
 				danger_state[encons-2]++;
 			}
 			if(encons==6){
-				end_state[0]++;
+				end_state[1]++;
 				return;
 			}
 		}
