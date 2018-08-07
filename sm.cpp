@@ -4,7 +4,8 @@
 #include <vector>
 #include <set>
 #include <algorithm>
-#include "Connect6Algo.h"
+#include <iostream>
+
 using namespace std;
 
 #define BOARD_SIZE 20
@@ -13,6 +14,17 @@ using namespace std;
 #define STATE_SIZE 12020
 #define DANGER_STATE_SIZE 10
 #define timebound 0.3
+
+
+//---------
+
+#define width 19
+#define height 19
+
+double s_time;
+double limitTime=5;
+//----------
+
 
 char info[100] = { "TeamName:룰베이스>딥러닝,Department:고려대학교" };
 // 바둑판 정보
@@ -50,7 +62,7 @@ struct compare
 	}
 };
 
-
+void myturn(int cnt);
 void board_init();
 void state_init();
 bool check_timeout(clock_t clock_start);
@@ -62,6 +74,12 @@ putstone min_value(double alpha, double beta,int step, clock_t clock_start);
 bool terminal_test();
 double utility();
 
+//------------------
+void init();
+int showBoard(int x,int y);
+void show();
+void domymove(int x[], int y[], int cnt);
+//------------------
 
 
 void myturn(int cnt) {
@@ -86,9 +104,11 @@ void myturn(int cnt) {
 			if(ps.score>mxv){
 				x[0] = ps.x[0]; x[1] = ps.x[1];
 				y[0] = ps.y[0]; y[1] = ps.y[1];	
+				mxv = ps.score;
 			}
 			step++;
 			if(check_timeout(clock_start)){
+				cout<<"timeout\n";
 				break;
 			}
 		}
@@ -99,14 +119,21 @@ void myturn(int cnt) {
 	// iterative deepening search
 	// 시간제한이 계속 바뀌는 건 어떻게? => s_time
 	int step=1;
-	double mxval = intmin+10;
-	while( step<20){
+	double mxval = intmin;
+	while( step<5){
 		putstone ps = alpha_beta_search(step, clock_start);
-		if(ps.score > mxval){
+		cout<<"score: "<<ps.score<<"\n";
+		if(mxval < intmin+10000){
+			x[0] = ps.x[0]; x[1] = ps.x[1];
+			y[0] = ps.y[0]; y[1] = ps.y[1];
+			mxval = ps.score;
+		}
+		else if(ps.score > intmin+10000){
 			x[0] = ps.x[0]; x[1] = ps.x[1];
 			y[0] = ps.y[0]; y[1] = ps.y[1];
 		}
-		step++;
+		//step++;
+		step+=1;
 		if(check_timeout(clock_start)){
 			break;
 		}
@@ -132,15 +159,21 @@ void board_init(){
 
 // 상태 초기화
 void state_init(){
-	memset((void*)state, 0, (size_t)STATE_SIZE);
-	memset((void*)danger_state, 0, (size_t)DANGER_STATE_SIZE);
+	for(int i=0; i<STATE_SIZE;i++){
+		state[i] = 0;
+	}
+	for(int i=0; i<DANGER_STATE_SIZE; i++){
+		danger_state[i]=0;
+	}
+	// memset(state, 0, (size_t)STATE_SIZE);
+	// memset(danger_state, 0, (size_t)DANGER_STATE_SIZE);
 	end_state[0]=0;
 	end_state[1]=0;
 }
 
 //check timeout
 bool check_timeout(clock_t clock_start){
-	if(s_time - (float)(clock()-clock_start)/CLOCKS_PER_SEC < timebound){
+	if(limitTime - (float)(clock()-clock_start)/CLOCKS_PER_SEC < timebound){
 		return true;
 	}
 	return false;
@@ -206,7 +239,7 @@ void count_state(){
 				return;
 			}
 		}
-		mine=0; tot=0; mycons=0; encons=0; myblock = 0; enblock=0;
+		mine=0; tot=0;enemy=0; mycons=0; encons=0; myblock = 0; enblock=0;
 
 		//가로축에서 적돌
 		for(int j=0; j<height; j++){
@@ -223,7 +256,7 @@ void count_state(){
 
 				if(enblock==0){
 					if(encons==4 || encons==5){
-						danger_state[encons-4]++;
+						danger_state[encons-2]++;
 					}
 					if(encons==6){
 						end_state[0]++;
@@ -237,7 +270,7 @@ void count_state(){
 				tot++;
 
 				if(encons==4 || encons==5){
-					danger_state[encons-4]++;
+					danger_state[encons-2]++;
 				}
 				if(encons==6){
 					end_state[0]++;
@@ -252,7 +285,7 @@ void count_state(){
 		}
 		if(enblock==0){
 			if(encons==4 || encons==5){
-				danger_state[encons-4]++;
+				danger_state[encons-2]++;
 			}
 			if(encons==6){
 				end_state[0]++;
@@ -318,7 +351,7 @@ void count_state(){
 				return;
 			}
 		}
-		mine=0; tot=0; mycons=0; encons=0; myblock = 0; enblock=0;
+		mine=0; tot=0; enemy=0; mycons=0; encons=0; myblock = 0; enblock=0;
 
 		// 세로축에서 적돌
 		for(int i=0; i<width; i++){
@@ -335,7 +368,7 @@ void count_state(){
 
 				if(enblock==0){
 					if(encons==4 || encons==5){
-						danger_state[encons-4]++;
+						danger_state[encons-2]++;
 					}
 					if(encons==6){
 						end_state[0]++;
@@ -349,7 +382,7 @@ void count_state(){
 				tot++;
 
 				if(encons==4 || encons==5){
-					danger_state[encons-4]++;
+					danger_state[encons-2]++;
 				}
 				if(encons==6){
 					end_state[0]++;
@@ -364,7 +397,7 @@ void count_state(){
 		}
 		if(enblock==0){
 			if(encons==4 || encons==5){
-				danger_state[encons-4]++;
+				danger_state[encons-2]++;
 			}
 			if(encons==6){
 				end_state[0]++;
@@ -433,7 +466,7 @@ void count_state(){
 				return;
 			}
 		}
-		mine=0; tot=0; mycons=0; encons=0; myblock = 0; enblock=0;
+		mine=0; tot=0; enemy=0; mycons=0; encons=0; myblock = 0; enblock=0;
 
 		//오른쪽아래로 대각선에서 적돌
 		for(int j=0; j<height; j++){
@@ -453,7 +486,7 @@ void count_state(){
 
 				if(enblock==0){
 					if(encons==4 || encons==5){
-						danger_state[encons-4]++;
+						danger_state[encons-2]++;
 					}
 					if(encons==6){
 						end_state[0]++;
@@ -467,7 +500,7 @@ void count_state(){
 				tot++;
 
 				if(encons==4 || encons==5){
-					danger_state[encons-4]++;
+					danger_state[encons-2]++;
 				}
 				if(encons==6){
 					end_state[0]++;
@@ -482,7 +515,7 @@ void count_state(){
 		}
 		if(enblock==0){
 			if(encons==4 || encons==5){
-				danger_state[encons-4]++;
+				danger_state[encons-2]++;
 			}
 			if(encons==6){
 				end_state[0]++;
@@ -553,7 +586,7 @@ void count_state(){
 				return;
 			}
 		}
-		mine=0; tot=0; mycons=0; encons=0; myblock = 0; enblock=0;
+		mine=0; tot=0; enemy=0;mycons=0; encons=0; myblock = 0; enblock=0;
 
 		//오른쪽위로 대각선에서 적돌
 		for(int j=0; j<height; j++){
@@ -573,7 +606,7 @@ void count_state(){
 
 				if(enblock==0){
 					if(encons==4 || encons==5){
-						danger_state[encons-4]++;
+						danger_state[encons-2]++;
 					}
 					if(encons==6){
 						end_state[0]++;
@@ -587,7 +620,7 @@ void count_state(){
 				tot++;
 
 				if(encons==4 || encons==5){
-					danger_state[encons-4]++;
+					danger_state[encons-2]++;
 				}
 				if(encons==6){
 					end_state[0]++;
@@ -602,7 +635,7 @@ void count_state(){
 		}
 		if(enblock==0){
 			if(encons==4 || encons==5){
-				danger_state[encons-4]++;
+				danger_state[encons-2]++;
 			}
 			if(encons==6){
 				end_state[0]++;
@@ -633,10 +666,13 @@ putstone put_first_stone(double alpha, double beta,int step, clock_t clock_start
 		}
 	}
 
-	
-	if(check_timeout(clock_start)){
-		return putstone{{-1,-1},{-1,-1},intmin};
+	if(lookuptable.size()<1){
+		return putstone{{width/2,-1},{height/2,-1},0};
 	}
+	
+	// if(check_timeout(clock_start)){
+	// 	return putstone{{-1,-1},{-1,-1},intmin};
+	// }
 
 	// 돌을 두개 놓는 action들을 돌면서 다음 step으로 간다.
 	for(set<point, compare>::iterator si=lookuptable.begin(); si!=lookuptable.end(); si++){
@@ -654,14 +690,16 @@ putstone put_first_stone(double alpha, double beta,int step, clock_t clock_start
 				nowput.score = val;
 				temp_stone = nowput;
 			}
-			if(val>=beta){
+			if(val>beta){
 				nowput.score = val;
 				return nowput;
 			}
 			alpha = max(alpha, val);
 			
 			if(check_timeout(clock_start)){
-				return putstone{{-1,-1},{-1,-1},intmin};
+				nowput.score = intmin+10;
+				cout<<"timeout\n";
+				return nowput;
 			}
 		
 	}
@@ -681,13 +719,13 @@ putstone alpha_beta_search(int step, clock_t clock_start){
 // int alpha : max bound
 // int beta : min bound
 putstone max_value(double alpha, double beta,int step, clock_t clock_start){
-	if(step==0 || terminal_test()){
-		if(end_state[0]>0){
-			return putstone{{-1,-1},{-1,-1},intmax-100000};
-		}
-		if(end_state[1]>0){
-			return putstone{{-1,-1},{-1,-1},intmin+100000};
-		}
+	if(step==0 ){ //|| terminal_test()){
+		// if(end_state[0]>0){
+		// 	return putstone{{-1,-1},{-1,-1},intmax-100000};
+		// }
+		// if(end_state[1]>0){
+		// 	return putstone{{-1,-1},{-1,-1},intmin+100000};
+		// }
 		
 		return putstone{{-1,-1},{-1,-1}, utility()};
 	}
@@ -710,12 +748,21 @@ putstone max_value(double alpha, double beta,int step, clock_t clock_start){
 		}
 	}
 
-	
-	if(check_timeout(clock_start)){
-		return putstone{{-1,-1},{-1,-1},intmin};
+
+	// 돌을 둘 수 있는 자리가 1개 남았을 때
+	if(lookuptable.size()==1){
+		set<point,compare>::iterator sit = lookuptable.begin();
+		point ps = *sit;
+		return putstone{{ps.x,-1},{ps.y,-1}, utility()};
 	}
 
+	
+	// if(check_timeout(clock_start)){
+	// 	return putstone{{-1,-1},{-1,-1},intmin};
+	// }
+
 	// 돌을 두개 놓는 action들을 돌면서 다음 step으로 간다.
+	// int testidx = 0;
 	for(set<point, compare>::iterator si=lookuptable.begin(); si!=lookuptable.end(); si++){
 		set<point, compare>::iterator sj = si;
 		sj++;
@@ -737,14 +784,19 @@ putstone max_value(double alpha, double beta,int step, clock_t clock_start){
 				nowput.score = val;
 				temp_stone = nowput;
 			}
-			if(val>=beta){
+			if(val>beta){
 				nowput.score = val;
 				return nowput;
 			}
 			alpha = max(alpha, val);
 			
+
+			// cout<<testidx<<"\n";
+			// testidx++;
 			if(check_timeout(clock_start)){
-				return putstone{{-1,-1},{-1,-1},intmin};
+				nowput.score = intmin+10;
+				cout<<"timeout\n";
+				return nowput;
 			}
 		}
 	}
@@ -752,16 +804,18 @@ putstone max_value(double alpha, double beta,int step, clock_t clock_start){
 	return temp_stone;
 }
 
+
+
 putstone min_value(double alpha, double beta,int step, clock_t clock_start){
 	// 지금이 iterative deepening으로 보는 마지막 단계면 종료
 	// 돌이 6개 두여있으면 종료인데 이 때 어떻게 처리?
-	if(step==0 || terminal_test()){
-		if(end_state[0]>0){
-			return putstone{{-1,-1},{-1,-1},intmax-100000};
-		}
-		if(end_state[1]>0){
-			return putstone{{-1,-1},{-1,-1},intmin+100000};
-		}
+	if(step==0){// || terminal_test()){
+		// if(end_state[0]>0){
+		// 	return putstone{{-1,-1},{-1,-1},intmax-100000};
+		// }
+		// if(end_state[1]>0){
+		// 	return putstone{{-1,-1},{-1,-1},intmin+100000};
+		// }
 
 		return putstone{{-1,-1}, {-1,-1}, utility()};
 	}
@@ -785,10 +839,17 @@ putstone min_value(double alpha, double beta,int step, clock_t clock_start){
 		}
 	}
 
-	
-	if(check_timeout(clock_start)){
-		return putstone{{-1,-1},{-1,-1},intmin};
+	// 돌을 둘 수 있는 자리가 1개남음
+	if(lookuptable.size()==1){
+		set<point,compare>::iterator sit = lookuptable.begin();
+		point ps = *sit;
+		return putstone{{ps.x,-1},{ps.y,-1}, utility()};
 	}
+
+	
+	// if(check_timeout(clock_start)){
+	// 	return putstone{{-1,-1},{-1,-1},intmin};
+	// }
 
 	// 돌을 두개 놓는 action들을 돌면서 다음 step으로 간다.
 	for(set<point, compare>::iterator si=lookuptable.begin(); si!=lookuptable.end(); si++){
@@ -812,7 +873,7 @@ putstone min_value(double alpha, double beta,int step, clock_t clock_start){
 				nowput.score = val;
 				temp_stone = nowput;
 			}
-			if(val<=alpha){
+			if(val<alpha){
 				nowput.score = val;
 				return nowput;
 			}
@@ -820,7 +881,9 @@ putstone min_value(double alpha, double beta,int step, clock_t clock_start){
 
 			
 			if(check_timeout(clock_start)){
-				return putstone{{-1,-1},{-1,-1},intmin};
+				nowput.score = intmin+10;
+				cout<<"timeout\n";
+				return nowput;
 			}
 		}
 	}
@@ -838,7 +901,146 @@ bool terminal_test(){
 
 double utility(){
 	count_state();
+	double value=0.0;
+	value += end_state[0] * 1000000;
+	value -= end_state[1] * 1100000;
+	value += ((danger_state[0]+ danger_state[1])*10000);
+	value -= ((danger_state[2]+ danger_state[3])*11000);	
 
+	// state : 00601 ~ 01919 10601 ~ 11919
+	
+	// benefit to me
+	for(int i=6; i<=19; i++){
+		for(int j=1; j<=i; j++){
+			value += state[i*100+j]*j*j;
+		}
+	}
+	// bad to me
+	
+	for(int i=6; i<=19; i++){
+		for(int j=1; j<=i; j++){
+			value -= state[10000+i*100+j]*j*j;
+		}
+	}
 
-	return 0;
+	//show();
+	return value;
 }
+
+
+
+
+
+
+
+
+
+
+
+//---------------------------
+void init(){
+    s_time = GetTickCount();
+    for(int i=0; i<width; i++){
+        for(int j=0; j<height; j++){
+            board[i][j]=0;
+        }
+    }
+}
+
+int showBoard(int x,int y){
+    return board[x][y];
+}
+
+void show(){
+    cout<<" ";
+    for(int i=0; i<width; i++){
+        cout<<char(i+65);
+    }
+    cout<<"\n";
+    for(int i=0; i<width; i++){
+        cout<<char(i+65);
+        for(int j=0; j<height; j++){
+            if(board[i][j]==0){
+                cout<<".";
+            }
+            if(board[i][j]==1){
+                cout<<"o";
+            }
+            if(board[i][j]==2){
+                cout<<"x";
+            }
+        }
+        cout<<"\n";
+    } 
+    cout<<"\n";
+}
+
+
+void domymove(int x[], int y[], int cnt) {
+    for(int i=0; i<cnt; i++){
+		cout<<x[i]<<", "<<y[i]<<"\n";
+        board[x[i]][y[i]] = 1;
+    }
+}
+
+bool checkinput(char x[2], char y[2]){
+	if(!(x[0]>='A' && x[0]<='Z')){
+		return false;
+	}
+	if(!(x[1]>='A' && x[1]<='Z')){
+		return false;
+	}
+	if(!(y[0]>='A' && y[0]<='Z')){
+		return false;
+	}
+	if(!(y[1]>='A' && y[1]<='Z')){
+		return false;
+	}
+	return true;
+}
+
+int main(){
+    init();
+
+    int cnt=1;
+    while(true){
+        myturn(cnt);
+        if(cnt==1){
+            cnt=2;
+        }
+
+        show();
+		terminal_test();
+		if(end_state[0]>0){
+			cout<<"computer win\n";
+			break;
+		}
+        
+        char x[2]={0,},y[2]={0,};
+		cout<<"insert stone\n";
+        cin>>x[0]>>y[0]>>x[1]>>y[1];
+		while(!checkinput(x,y) || !(board[x[0]-65][y[0]-65] == 0 && board[x[1]-65][y[1]-65]==0)){
+			cout<<"wrong input, redo\n";
+			cin>>x[0]>>y[0]>>x[1]>>y[1];
+		}
+        for(int i=0; i<cnt; i++){
+            board[x[i]-65][y[i]-65] = 2;
+        }
+
+        show();
+		terminal_test();
+		if(end_state[1]>0){
+			cout<<"user win\n";
+			break;
+		}
+    }
+
+	char c;
+	cin>>c;
+    return 0;
+}
+
+
+
+
+
