@@ -901,10 +901,10 @@ bool terminal_test(){
 double utility(){
 	count_state();
 	double value=0.0;
-	value += end_state[0] * 1000000;
-	value -= end_state[1] * 1100000;
-	value += ((danger_state[0]+ danger_state[1])*10000);
-	value -= ((danger_state[2]+ danger_state[3])*11000);	
+	value += end_state[0] * 100000;
+	value -= end_state[1] * 1000000;
+	value += ((danger_state[0]+ danger_state[1])*1000);
+	value -= ((danger_state[2]+ danger_state[3])*10000);	
 
 	// state : 00601 ~ 01919 10601 ~ 11919
 	
