@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <Windows.h>
 #include <time.h>
 #include <vector>
 #include <set>
@@ -939,7 +938,6 @@ double utility(){
 
 //---------------------------
 void init(){
-    s_time = GetTickCount();
     for(int i=0; i<width; i++){
         for(int j=0; j<height; j++){
             board[i][j]=0;
