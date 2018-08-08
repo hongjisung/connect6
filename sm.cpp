@@ -4,6 +4,7 @@
 #include <set>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -107,7 +108,6 @@ void myturn(int cnt) {
 			}
 			step++;
 			if(check_timeout(clock_start)){
-				cout<<"timeout\n";
 				break;
 			}
 		}
@@ -121,6 +121,7 @@ void myturn(int cnt) {
 	double mxval = intmin;
 	while( step<5){
 		putstone ps = alpha_beta_search(step, clock_start);
+		cout<<"time: "<<(float)(clock()-clock_start)/CLOCKS_PER_SEC<<"\n";
 		cout<<"score: "<<ps.score<<"\n";
 		if(mxval < intmin+10000){
 			x[0] = ps.x[0]; x[1] = ps.x[1];
@@ -195,7 +196,7 @@ void count_state(){
 				mycons++;
 			}
 			else if(board[i][j]==2){
-				if(tot>=6){
+				if(tot>=6 && mycons<=6){
 					state[tot*100+mine]++;
 				}
 				mine=0; tot=0;
@@ -226,7 +227,7 @@ void count_state(){
 				myblock=0;
 			}
 		}
-		if(tot>=6){
+		if(tot>=6 && mycons<=6){
 			state[tot*100+mine]++;
 		}
 		if(myblock==0){
@@ -248,7 +249,7 @@ void count_state(){
 				encons++;
 			}
 			else if(board[i][j]==1|| board[i][j]==3){
-				if(tot>=6){
+				if(tot>=6 && encons<=6){
 					state[10000+tot*100+enemy]++;
 				}
 				enemy=0; tot=0;
@@ -279,7 +280,7 @@ void count_state(){
 				enblock=0;
 			}
 		}
-		if(tot>=6){
+		if(tot>=6 && encons<=6){
 			state[10000+tot*100+enemy]++;
 		}
 		if(enblock==0){
@@ -307,7 +308,7 @@ void count_state(){
 				mycons++;
 			}
 			else if(board[i][j]==2){
-				if(tot>=6){
+				if(tot>=6&& mycons<=6){
 					state[tot*100+mine]++;
 				}
 				mine=0; tot=0;
@@ -338,7 +339,7 @@ void count_state(){
 				myblock=0;
 			}
 		}
-		if(tot>=6){
+		if(tot>=6&& mycons<=6){
 			state[tot*100+mine]++;
 		}
 		if(myblock==0){
@@ -360,7 +361,7 @@ void count_state(){
 				encons++;
 			}
 			else if(board[i][j]==1|| board[i][j]==3){
-				if(tot>=6){
+				if(tot>=6&& encons<=6){
 					state[10000+tot*100+enemy]++;
 				}
 				enemy=0; tot=0;
@@ -391,7 +392,7 @@ void count_state(){
 				enblock=0;
 			}
 		}
-		if(tot>=6){
+		if(tot>=6&& encons<=6){
 			state[10000+tot*100+enemy]++;
 		}
 		if(enblock==0){
@@ -422,7 +423,7 @@ void count_state(){
 				mycons++;
 			}
 			else if(board[i+j][j]==2){
-				if(tot>=6){
+				if(tot>=6&& mycons<=6){
 					state[tot*100+mine]++;
 				}
 				mine=0; tot=0;
@@ -453,7 +454,7 @@ void count_state(){
 				myblock=0;
 			}
 		}
-		if(tot>=6){
+		if(tot>=6&& mycons<=6){
 			state[tot*100+mine]++;
 		}
 		if(myblock==0){
@@ -478,7 +479,7 @@ void count_state(){
 				encons++;
 			}
 			else if(board[i+j][j]==1|| board[i+j][j]==3){
-				if(tot>=6){
+				if(tot>=6&& encons<=6){
 					state[10000+tot*100+enemy]++;
 				}
 				enemy=0; tot=0;
@@ -509,7 +510,7 @@ void count_state(){
 				enblock=0;
 			}
 		}
-		if(tot>=6){
+		if(tot>=6&& encons<=6){
 			state[10000+tot*100+enemy]++;
 		}
 		if(enblock==0){
@@ -542,7 +543,7 @@ void count_state(){
 				mycons++;
 			}
 			else if(board[i-j][j]==2){
-				if(tot>=6){
+				if(tot>=6&& mycons<=6){
 					state[tot*100+mine]++;
 				}
 				mine=0; tot=0;
@@ -573,7 +574,7 @@ void count_state(){
 				myblock=0;
 			}
 		}
-		if(tot>=6){
+		if(tot>=6&& mycons<=6){
 			state[tot*100+mine]++;
 		}
 		if(myblock==0){
@@ -598,7 +599,7 @@ void count_state(){
 				encons++;
 			}
 			else if(board[i-j][j]==1|| board[i-j][j]==3){
-				if(tot>=6){
+				if(tot>=6&& encons<=6){
 					state[10000+tot*100+enemy]++;
 				}
 				enemy=0; tot=0;
@@ -629,7 +630,7 @@ void count_state(){
 				enblock=0;
 			}
 		}
-		if(tot>=6){
+		if(tot>=6&& encons<=6){
 			state[10000+tot*100+enemy]++;
 		}
 		if(enblock==0){
@@ -656,7 +657,7 @@ putstone put_first_stone(double alpha, double beta,int step, clock_t clock_start
 			if(board[i][j]!=0){
 				for(int si=i-2;si<=i+2; si++){
 					for(int sj=j-2;sj<=j+2;sj++){
-						if(board[si][sj]==0){
+						if(si>=0 && si<width && sj>=0 && sj<height &&board[si][sj]==0){
 							lookuptable.insert(point{si,sj});
 						}
 					}
@@ -697,7 +698,6 @@ putstone put_first_stone(double alpha, double beta,int step, clock_t clock_start
 			
 			if(check_timeout(clock_start)){
 				nowput.score = intmin+10;
-				cout<<"timeout\n";
 				return nowput;
 			}
 		
@@ -718,14 +718,7 @@ putstone alpha_beta_search(int step, clock_t clock_start){
 // int alpha : max bound
 // int beta : min bound
 putstone max_value(double alpha, double beta,int step, clock_t clock_start){
-	if(step==0 ){ //|| terminal_test()){
-		// if(end_state[0]>0){
-		// 	return putstone{{-1,-1},{-1,-1},intmax-100000};
-		// }
-		// if(end_state[1]>0){
-		// 	return putstone{{-1,-1},{-1,-1},intmin+100000};
-		// }
-		
+	if(step==0 ){ 
 		return putstone{{-1,-1},{-1,-1}, utility()};
 	}
 	double val = intmin;
@@ -738,7 +731,10 @@ putstone max_value(double alpha, double beta,int step, clock_t clock_start){
 			if(board[i][j]!=0){
 				for(int si=i-2;si<=i+2; si++){
 					for(int sj=j-2;sj<=j+2;sj++){
-						if(board[si][sj] == 0){
+						if(abs(si-i)+abs(sj-j)==3){
+							continue;
+						}
+						if(si>=0 && si<width && sj>=0 && sj<height &&board[si][sj] == 0){
 							lookuptable.insert(point{si,sj});
 						}
 					}
@@ -747,7 +743,7 @@ putstone max_value(double alpha, double beta,int step, clock_t clock_start){
 		}
 	}
 
-
+	//cout<<"look size: "<<lookuptable.size()<<"\n";
 	// 돌을 둘 수 있는 자리가 1개 남았을 때
 	if(lookuptable.size()==1){
 		set<point,compare>::iterator sit = lookuptable.begin();
@@ -756,9 +752,7 @@ putstone max_value(double alpha, double beta,int step, clock_t clock_start){
 	}
 
 	
-	// if(check_timeout(clock_start)){
-	// 	return putstone{{-1,-1},{-1,-1},intmin};
-	// }
+	
 
 	// 돌을 두개 놓는 action들을 돌면서 다음 step으로 간다.
 	// int testidx = 0;
@@ -808,13 +802,7 @@ putstone max_value(double alpha, double beta,int step, clock_t clock_start){
 putstone min_value(double alpha, double beta,int step, clock_t clock_start){
 	// 지금이 iterative deepening으로 보는 마지막 단계면 종료
 	// 돌이 6개 두여있으면 종료인데 이 때 어떻게 처리?
-	if(step==0){// || terminal_test()){
-		// if(end_state[0]>0){
-		// 	return putstone{{-1,-1},{-1,-1},intmax-100000};
-		// }
-		// if(end_state[1]>0){
-		// 	return putstone{{-1,-1},{-1,-1},intmin+100000};
-		// }
+	if(step==0){
 
 		return putstone{{-1,-1}, {-1,-1}, utility()};
 	}
@@ -829,7 +817,10 @@ putstone min_value(double alpha, double beta,int step, clock_t clock_start){
 			if(board[i][j]!=0){
 				for(int si=i-2;si<=i+2; si++){
 					for(int sj=j-2;sj<=j+2;sj++){
-						if(board[si][sj] == 0){
+						if(abs(si-i)+abs(sj-j)==3){
+							continue;
+						}
+						if(si>=0 && si<width && sj>=0 && sj<height &&board[si][sj] == 0){
 							lookuptable.insert(point{si,sj});
 						}
 					}
@@ -838,6 +829,7 @@ putstone min_value(double alpha, double beta,int step, clock_t clock_start){
 		}
 	}
 
+
 	// 돌을 둘 수 있는 자리가 1개남음
 	if(lookuptable.size()==1){
 		set<point,compare>::iterator sit = lookuptable.begin();
@@ -845,10 +837,6 @@ putstone min_value(double alpha, double beta,int step, clock_t clock_start){
 		return putstone{{ps.x,-1},{ps.y,-1}, utility()};
 	}
 
-	
-	// if(check_timeout(clock_start)){
-	// 	return putstone{{-1,-1},{-1,-1},intmin};
-	// }
 
 	// 돌을 두개 놓는 action들을 돌면서 다음 step으로 간다.
 	for(set<point, compare>::iterator si=lookuptable.begin(); si!=lookuptable.end(); si++){
@@ -901,24 +889,39 @@ bool terminal_test(){
 double utility(){
 	count_state();
 	double value=0.0;
-	value += end_state[0] * 100000;
-	value -= end_state[1] * 1000000;
-	value += ((danger_state[0]+ danger_state[1])*1000);
-	value -= ((danger_state[2]+ danger_state[3])*10000);	
+	value += end_state[0] * 5000000;
+	value -= end_state[1] * 10000000;
+	value += ((danger_state[0]+ danger_state[1])*5*5*20);
+	value -= ((danger_state[2]+ danger_state[3])*5*5*20);	
 
 	// state : 00601 ~ 01919 10601 ~ 11919
 	
 	// benefit to me
 	for(int i=6; i<=19; i++){
 		for(int j=1; j<=i; j++){
-			value += state[i*100+j]*j*j;
+			if(j<4){
+				value += state[i*100+j]*j*j;
+			}
+			else if(6>j>=4){
+				value += state[i*100+j]*5*5*20;
+			}
+			else{
+				value += state[i*100+j]*5*5*20;
+			}
 		}
 	}
 	// bad to me
 	
 	for(int i=6; i<=19; i++){
-		for(int j=1; j<=i; j++){
-			value -= state[10000+i*100+j]*j*j;
+		for(int j=1; j<=i; j++){if(j<4){
+				value -= state[10000+i*100+j]*j*j;
+			}
+			else if(6>j>=4){
+				value -= state[10000+i*100+j]*5*5*20*8;
+			}
+			else{
+				value -= state[10000+i*100+j]*5*5*20*8;
+			}
 		}
 	}
 
@@ -952,20 +955,20 @@ int showBoard(int x,int y){
 void show(){
     cout<<" ";
     for(int i=0; i<width; i++){
-        cout<<char(i+65);
+        cout<<char(i+65)<<" ";
     }
     cout<<"\n";
     for(int i=0; i<width; i++){
         cout<<char(i+65);
         for(int j=0; j<height; j++){
             if(board[i][j]==0){
-                cout<<".";
+                cout<<". ";
             }
             if(board[i][j]==1){
-                cout<<"o";
+                cout<<"o ";
             }
             if(board[i][j]==2){
-                cout<<"x";
+                cout<<"x ";
             }
         }
         cout<<"\n";
@@ -997,9 +1000,35 @@ bool checkinput(char x[2], char y[2]){
 	return true;
 }
 
-int main(){
-    init();
+void writeData(vector<vector<int> > &data, int mode){
+	count_state();
+	data.push_back(vector<int>());
+	int s = data.size()-1;
 
+	int m = (mode&1);
+	for(int i=6; i<=19; i++){
+		for(int j=1; j<=i; j++){
+			// mode : 0->0, 1->1
+			data[s].push_back(state[10000*m+i*100+j]);		
+		}
+	}
+
+	m = (mode^1);
+	for(int i=6; i<=19; i++){
+		for(int j=1; j<=i; j++){
+			// mode : 0->1, 1->0
+			data[s].push_back(state[10000*m+i*100+j]);		
+		}
+	}
+}
+
+int main(){
+	string filePath = "./data2.csv";
+	vector<vector<int> > blackdata;
+	vector<vector<int> > whitedata;
+
+
+    init();
     int cnt=1;
     while(true){
         myturn(cnt);
@@ -1008,6 +1037,9 @@ int main(){
         }
 
         show();
+		writeData(blackdata, 0);
+		writeData(whitedata, 1);
+
 		terminal_test();
 		if(end_state[0]>0){
 			cout<<"computer win\n";
@@ -1026,6 +1058,8 @@ int main(){
         }
 
         show();
+		writeData(blackdata,0);
+		writeData(whitedata,1);
 		terminal_test();
 		if(end_state[1]>0){
 			cout<<"user win\n";
@@ -1033,8 +1067,61 @@ int main(){
 		}
     }
 
-	char c;
-	cin>>c;
+	ofstream fout;
+	ifstream fin;
+	fin.open(filePath);
+	if(!fin.good()){
+		fin.close();
+		
+		fout.open(filePath);
+		for(int i=6; i<=19; i++){
+			for(int j=1; j<=i; j++){
+				int temp = i*100+j;
+				fout<<temp<<",";	
+			}
+		}
+		for(int i=6; i<=19; i++){
+			for(int j=1; j<=i; j++){
+				int temp = 10000+i*100+j;
+				fout<<temp<<",";
+			}
+		}
+		fout<<"result\n";
+		fout.close();
+	}
+
+	fout.open(filePath, ios::app);
+	if(end_state[0]>0){
+		for(int i=2; i<blackdata.size(); i++){
+			for(int j=0;j<blackdata[i].size(); j++){
+				fout<<(blackdata[i][j])<<",";
+			}
+			fout<<"WIN\n";
+		}
+		for(int i=2; i<whitedata.size(); i++){
+			for(int j=0;j<whitedata[i].size(); j++){
+				fout<<whitedata[i][j]<<",";
+			}
+			fout<<"LOSE\n";
+		}
+	}
+	else{
+		for(int i=2; i<whitedata.size(); i++){
+			for(int j=0;j<whitedata[i].size(); j++){
+				fout<<whitedata[i][j]<<",";
+			}
+			fout<<"WIN\n";
+		}
+		for(int i=2; i<blackdata.size(); i++){
+			for(int j=0;j<blackdata[i].size(); j++){
+				fout<<blackdata[i][j]<<",";
+			}
+			fout<<"LOSE\n";
+		}
+		
+	}
+	
+	fout.close();
     return 0;
 }
 
